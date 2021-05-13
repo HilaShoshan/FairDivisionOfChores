@@ -1,4 +1,4 @@
-# FairDivisionOfCourses
+# FairDivisionOfTasks
 ## Research Final Project
 
 I started my project with the theme of fair division of tasks (objects with non-positive utility), in a continuous period of time. 
