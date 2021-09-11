@@ -52,8 +52,10 @@ def get_chore_indx(match):
 
 
 def isEF1(matching, utilities):
-    utility1 = 0
-    utility2 = 0
+    utility1_A = 0
+    utility1_B = 0
+    utility2_A = 0
+    utility2_B = 0
     worst1 = 0
     worst2 = 0
     for match in matching:
@@ -62,18 +64,23 @@ def isEF1(matching, utilities):
         if chore_indx == -1:  # a dummy chore
             continue
         # add the utility
-        if agent == 1:
-            utility = utilities[chore_indx][0]
-            if utility < worst1:  # update minimum
-                worst1 = utility
-            utility1 += utility
-        else:
-            utility = utilities[chore_indx][1]
-            if utility < worst2:
-                worst2 = utility
-            utility2 += utility
+        u1 = utilities[chore_indx][0]
+        u2 = utilities[chore_indx][1]
+        if agent == 1:  # this is the allocation of agent 1
+            if u1 < worst1:  # update minimum of 1
+                worst1 = u1
+            utility1_A += u1
+            utility2_A += u2
+        else:  # 2's allocation
+            if u2 < worst2:  # update minimum of 2
+                worst2 = u2
+            utility1_B += u1
+            utility2_B += u2
     # check EF1
-    if utility1-worst1 >= utility2 and utility2-worst2 >= utility1:
+    print("Division A=(A1,A2)")
+    print("u1(A1): ", utility1_A, " u1(A2): ", utility1_B, " worst: ", worst1)
+    print("u2(A2): ", utility2_B, " u2(A1): ", utility2_A, " worst: ", worst2)
+    if utility1_A-worst1 >= utility1_B and utility2_B-worst2 >= utility2_A:
         return True
     return False
 
@@ -109,9 +116,11 @@ def get_point(u1_t, u1_t_star, u2_t, u2_t_star):
     return (a, 1-a)
 
 
-utilities = ((-1,-2),(-5,-5),(-3,-1),(-2,0),(0,-1))
+# utilities = ((-1,-2),(-5,-5),(-3,-1),(-2,0),(0,-1))
+utilities = ((-2,-2),(-2,-2),(-2,-2),(-2,-2),(-2,-2),(-5,-5),(-3,-1),(-2,0),(0,-1))
 
-G = create_G(5, utilities, 4)
+# G = create_G(5, utilities, 4)
+G = create_G(9, utilities, 6)
 nx.max_weight_matching(G, maxcardinality=True)
 matching = nx.max_weight_matching(G, maxcardinality=True)  # initial division
 print(matching)
@@ -127,7 +136,8 @@ while not isEF1(matching, utilities):
         u2_t_star = utilities[t_star_indx][1]
     a, b = get_point(utilities[t_indx][0], u1_t_star, utilities[t_indx][1], u2_t_star)
     print("a, b:", a, b)
-    G = create_G(5, utilities, 4, point=(a, b))
+    # G = create_G(5, utilities, 4, point=(a, b))
+    G = create_G(9, utilities, 6, point=(a, b))
     nx.max_weight_matching(G, maxcardinality=True)
     matching = nx.max_weight_matching(G, maxcardinality=True)  # initial division
     print(matching)
