@@ -87,8 +87,9 @@ def get_ts(matching, utilities):
         agent = recognize_agent(match)
         chore_indx = get_chore_indx(match)
         if chore_indx == -1:  # a dummy chore
-            continue
-        utility = utilities[chore_indx][1]
+            utility = 0
+        else:
+            utility = utilities[chore_indx][1]
         if agent == 1:  # it's a matching to 1
             if utility > max:
                 max = utility
@@ -118,7 +119,13 @@ print(matching)
 while not isEF1(matching, utilities):
     t_indx, t_star_indx = get_ts(matching, utilities)
     print("t, t*:", t_indx, t_star_indx)
-    a, b = get_point(utilities[t_indx][0], utilities[t_star_indx][0], utilities[t_indx][1], utilities[t_star_indx][1])
+    if t_star_indx == -1:  # dummy
+        u1_t_star = 0
+        u2_t_star = 0
+    else:
+        u1_t_star = utilities[t_star_indx][0]
+        u2_t_star = utilities[t_star_indx][1]
+    a, b = get_point(utilities[t_indx][0], u1_t_star, utilities[t_indx][1], u2_t_star)
     print("a, b:", a, b)
     G = create_G(5, utilities, 4, point=(a, b))
     nx.max_weight_matching(G, maxcardinality=True)
