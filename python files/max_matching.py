@@ -1,5 +1,5 @@
 import math
-
+import numpy as np
 import networkx as nx
 
 
@@ -69,39 +69,37 @@ def get_partial_divisions(matching):
     return A1, A2
 
 
-def isEF1(matching, utilities):
-    utility1_A = 0
-    utility1_B = 0
-    utility2_A = 0
-    utility2_B = 0
-    worst1 = 0
-    worst2 = 0
-    for match in matching:
-        agent = recognize_agent(match)
-        chore = get_chore(match)
+def map_to_utilities(A, utilities):
+    """
+    map the given partial division, A, to utilities lists
+    :return: u1 - a list that contains the utility values on agent 1's eyes of each chore in A
+             u2 - similar to agent 2
+    """
+    u1 = []
+    u2 = []
+    for chore in A:
         if chore[0] == 'd':  # a dummy chore
             continue
         chore_indx = int(chore[1])
-        # add the utility
-        u1 = utilities[chore_indx][0]
-        u2 = utilities[chore_indx][1]
-        if agent == 1:  # this is the allocation of agent 1
-            if u1 < worst1:  # update minimum of 1
-                worst1 = u1
-            utility1_A += u1
-            utility2_A += u2
-        else:  # 2's allocation
-            if u2 < worst2:  # update minimum of 2
-                worst2 = u2
-            utility1_B += u1
-            utility2_B += u2
-    A1, A2 = get_partial_divisions(matching)
-    print("A1: ", A1)
-    print("A2: ", A2)
+        # add chore's utility
+        u1.append(utilities[chore_indx][0])
+        u2.append(utilities[chore_indx][1])
+    return u1, u2
+
+
+def isEF1(A1, A2, utilities):
+    u1A1_lst, u2A1_lst = map_to_utilities(A1, utilities)
+    u1A2_lst, u2A2_lst = map_to_utilities(A2, utilities)
+    worst1 = min(u1A1_lst)
+    worst2 = min(u2A2_lst)
     # check EF1
-    print("u1(A1): ", utility1_A, " u1(A2): ", utility1_B, " worst: ", worst1)
-    print("u2(A2): ", utility2_B, " u2(A1): ", utility2_A, " worst: ", worst2)
-    if utility1_A-worst1 >= utility1_B and utility2_B-worst2 >= utility2_A:
+    u1A1 = sum(u1A1_lst)
+    u2A1 = sum(u2A1_lst)
+    u1A2 = sum(u1A2_lst)
+    u2A2 = sum(u2A2_lst)
+    print("u1(A1): ", u1A1, " u1(A2): ", u1A2, " worst: ", worst1)
+    print("u2(A2): ", u2A2, " u2(A1): ", u2A1, " worst: ", worst2)
+    if u1A1-worst1 >= u1A2 and u2A2-worst2 >= u2A1:
         return True
     return False
 
@@ -120,6 +118,7 @@ def new_point(old_a, old_b):
 
 def divideToGroups(G, chores):
     diff_dict = {}
+    values_dict = {}  # saves the utility values for each group (in the same order)
     for chore in chores:  # include dummy chores
         u1 = G.get_edge_data('A0', chore)['weight']
         u2 = G.get_edge_data('B0', chore)['weight']
@@ -127,9 +126,11 @@ def divideToGroups(G, chores):
         # print("chore: ", chore, " diff: ", diff)
         if diff in diff_dict:  # already exists
             diff_dict[diff] = diff_dict[diff] + [chore]  # concat the new chore
+            values_dict[diff] = values_dict[diff] + u1
         else:
             diff_dict[diff] = [chore]
-    return diff_dict
+            values_dict[diff] = u1
+    return diff_dict, values_dict
 
 
 def how_much(A, group):
@@ -153,19 +154,24 @@ while True:
     print("Point:", (a, b))
     G, chores = create_G(9, utilities, 6, point=(a, b))
     matching = nx.max_weight_matching(G, maxcardinality=True)  # initial division
-    if isEF1(matching, utilities):
+    A1, A2 = get_partial_divisions(matching)
+    print("A1: ", A1)
+    print("A2: ", A2)
+    if isEF1(A1, A2, utilities):
         break
     # check if exists an EF1 max-matching with the same point (a,b)
-    groups = divideToGroups(G, chores)  # does not depend on the matching
-    A1, A2 = get_partial_divisions(matching)
-    for group in groups:
-        # print("group: ", groups[group])
-        num = how_much(A1, groups[group])  # the number of chores agent 1 gets from this group
+    groups, vals_dict = divideToGroups(G, chores)  # does not depend on the matching
+    for diff in groups:
+        group = groups[diff]
+        num = how_much(A1, group)  # the number of chores agent 1 gets from this group
         if num == 0 or num == 1:
             continue
+        vals = np.array(vals_dict[diff])
+        indices = (-vals).argsort()[:num]  # get 'num' maximum indices of vals
+        best = [group[index] for index in indices]
         # choose another set of size num each time
         # check the new matching
-        if isEF1(matching, utilities):
+        if isEF1(A1, A2, utilities):
             break
     break
     a, b = new_point(a, b)
