@@ -117,8 +117,13 @@ def new_point(old_a, old_b):
 
 
 def divideToGroups(G, chores):
+    """
+    returns a dictionary with u1-u2 differential as keys, and groups of all the chores
+    with this differential value as values.
+    each group of chores is sorted by the utility value (from the best chore to the worst)
+    """
     diff_dict = {}
-    values_dict = {}  # saves the utility values for each group (in the same order)
+    values_dict = {}  # saves the utility values by agent 1 for each group (in the same order)
     for chore in chores:  # include dummy chores
         u1 = G.get_edge_data('A0', chore)['weight']
         u2 = G.get_edge_data('B0', chore)['weight']
@@ -126,28 +131,37 @@ def divideToGroups(G, chores):
         # print("chore: ", chore, " diff: ", diff)
         if diff in diff_dict:  # already exists
             diff_dict[diff] = diff_dict[diff] + [chore]  # concat the new chore
-            values_dict[diff] = values_dict[diff] + u1
+            values_dict[diff] = values_dict[diff] + [u1]
         else:
             diff_dict[diff] = [chore]
-            values_dict[diff] = u1
-    return diff_dict, values_dict
+            values_dict[diff] = [u1]
+    # sort each group in diff_dict from the best chore to the worst one
+    for diff in diff_dict:
+        group = diff_dict[diff]
+        vals = np.array(values_dict[diff])
+        indices = (-vals).argsort()  # get the indices on the right order
+        diff_dict[diff] = [group[index] for index in indices]
+    return diff_dict
 
 
 def how_much(A, group):
     """
     returns the number of chores an agent with partial allocation A gets from the given group
+    and A without these chores
     """
+    reduced = A.copy()
     count = 0
     for chore in A:
         if chore in group:
             count += 1
-    return count
+            reduced.remove(chore)
+    return count, reduced
 
 
 print("Division A = (A1,A2)\n")
 utilities = ((-2,-2),(-2,-2),(-2,-2),(-2,-2),(-2,-2),(-5,-5),(-3,-1),(-2,0),(0,-1))
 
-a = 1.0
+a = 0.1
 b = 0.0
 
 while True:
@@ -158,23 +172,30 @@ while True:
     print("A1: ", A1)
     print("A2: ", A2)
     if isEF1(A1, A2, utilities):
-        break
+        print("done :)")
+        exit()
     # check if exists an EF1 max-matching with the same point (a,b)
-    groups, vals_dict = divideToGroups(G, chores)  # does not depend on the matching
+    groups = divideToGroups(G, chores)  # does not depend on the matching
     for diff in groups:
         group = groups[diff]
-        num = how_much(A1, group)  # the number of chores agent 1 gets from this group
-        if num == 0 or num == 1:
+        print("group: ", group)
+        num1, reducedA1 = how_much(A1, group)  # the number of chores agent 1 gets from this group and the allocation without these chores
+        num2, reducedA2 = how_much(A2, group)  # same for 2
+        print("num1, num2: ", num1, num2)
+        if num1 == 0 or num1 == 1 or num1 == len(group) or num1 == len(group)-1:  # no other options
             continue
-        vals = np.array(vals_dict[diff])
-        indices = (-vals).argsort()[:num]  # get 'num' maximum indices of vals
-        best = [group[index] for index in indices]
-        # choose another set of size num each time
-        # check the new matching
-        if isEF1(A1, A2, utilities):
-            break
-    break
+        # choose another set of size num1 each time
+        for i in range(len(group)-num1):
+            A1 = reducedA1 + group[i:i+num1]
+            A2 = reducedA2 + group[0:i] + group[i+num1:]
+            print("A1: ", A1)
+            print("A2: ", A2)
+            # check the new matching
+            if isEF1(A1, A2, utilities):
+                print("done :)")
+                exit()
+    print("__________________________________________________________")
     a, b = new_point(a, b)
     if a < 0:
-        print("end.")
-        break
+        print("An EF1 division has not found :(")
+        exit()
