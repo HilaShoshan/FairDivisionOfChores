@@ -3,6 +3,9 @@ import numpy as np
 import networkx as nx
 
 
+epsilon = 0.0001  # to solve numeric problems
+
+
 def create_G(m, utilities, s, point=(1, 0), n=2):
     """
     Create G_{a,b,c} graph for general chores in each category & 2 agents
@@ -129,10 +132,13 @@ def divideToGroups(G, chores):
         u2 = G.get_edge_data('B0', chore)['weight']
         diff = u1-u2
         # print("chore: ", chore, " diff: ", diff)
-        if diff in diff_dict:  # already exists
-            diff_dict[diff] = diff_dict[diff] + [chore]  # concat the new chore
-            values_dict[diff] = values_dict[diff] + [u1]
-        else:
+        flag = False
+        for key in diff_dict:
+            if key-epsilon <= diff <= key+epsilon:
+                diff_dict[key] = diff_dict[key] + [chore]  # concat the new chore to the group
+                values_dict[key] = values_dict[key] + [u1]
+                flag = True
+        if not flag:  # we haven't add the new chore to the dict yet
             diff_dict[diff] = [chore]
             values_dict[diff] = [u1]
     # sort each group in diff_dict from the best chore to the worst one
@@ -161,7 +167,7 @@ def how_much(A, group):
 print("Division A = (A1,A2)\n")
 utilities = ((-2,-2),(-2,-2),(-2,-2),(-2,-2),(-2,-2),(-5,-5),(-3,-1),(-2,0),(0,-1))
 
-a = 0.1
+a = 1.0
 b = 0.0
 
 while True:
@@ -181,7 +187,7 @@ while True:
         print("group: ", group)
         num1, reducedA1 = how_much(A1, group)  # the number of chores agent 1 gets from this group and the allocation without these chores
         num2, reducedA2 = how_much(A2, group)  # same for 2
-        print("num1, num2: ", num1, num2)
+        # print("num1, num2: ", num1, num2)
         if num1 == 0 or num1 == 1 or num1 == len(group) or num1 == len(group)-1:  # no other options
             continue
         # choose another set of size num1 each time
