@@ -82,6 +82,8 @@ def map_to_utilities(A, utilities):
     u2 = []
     for chore in A:
         if chore[0] == 'd':  # a dummy chore
+            u1.append(0)
+            u2.append(0)
             continue
         chore_indx = int(chore[1])
         # add chore's utility
@@ -111,11 +113,11 @@ def new_point(old_a, old_b):
     """
     "Moving knife" idea, but in the discrete case
     Ascend up the line in constant jumps
-    :return: the new point: (old_a-val, old_b+val)
+    :return: the new point: (old_a-step, old_b+step)
     """
-    val = 0.1
-    a = old_a - val
-    b = old_b + val
+    step = 0.05  # 0.1
+    a = old_a - step
+    b = old_b + step
     return (a, b)
 
 
@@ -165,14 +167,20 @@ def how_much(A, group):
 
 
 print("Division A = (A1,A2)\n")
-utilities = ((-2,-2),(-2,-2),(-2,-2),(-2,-2),(-2,-2),(-5,-5),(-3,-1),(-2,0),(0,-1))
+# only one category!!!                                                                 #   a     b    chores   capacity
+# utilities = ((-2,-2),(-2,-2),(-2,-2),(-2,-2),(-2,-2),(-5,-5),(-3,-1),(-2,0),(0,-1))  #  0.5   0.5     9         6
+# utilities = ((0,-1),(-2,-3),(-4,-6),(-10,-10))                                       #  0.6   0.4     4       2,3,4
+# utilities = ((0,-1),(-2,-3),(-4,-6))                                                 #  0.6   0.4     3        3,2
+# utilities = ((-1,0),(-3,-2),(-6,-4))                                                 #  0.4   0.6     3        3,2
+# utilities = ((-1,-5),(-2,-10),(-3,-20))                                              #  0.85  0.15    3         2
+utilities = ((-1,-5),(-10,-2),(-3,-20))                                                #   1     0      3         2
 
 a = 1.0
 b = 0.0
 
 while True:
     print("Point:", (a, b))
-    G, chores = create_G(9, utilities, 6, point=(a, b))
+    G, chores = create_G(3, utilities, 2, point=(a, b))
     matching = nx.max_weight_matching(G, maxcardinality=True)  # initial division
     A1, A2 = get_partial_divisions(matching)
     print("A1: ", A1)
