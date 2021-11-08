@@ -19,15 +19,15 @@ print("Division A = (A1,A2)\n")
 # utilities = ((0,-1),(-2,-3),(-4,-6),(-10,-10))                                       #  0.6   0.4     4       2,3,4
 # utilities = ((0,-1),(-2,-3),(-4,-6))                                                 #  0.6   0.4     3        3,2
 # utilities = ((-1,0),(-3,-2),(-6,-4))                                                 #  0.4   0.6     3        3,2
-# utilities = ((-1,-5),(-2,-10),(-3,-20))                                              #  0.85  0.15    3         2
-# utilities = ((-1,-5),(-10,-2),(-3,-20))                                                #   1     0      3         2
+utilities = ((-1,-5),(-2,-10),(-3,-20))                                              #  0.85  0.15    3         2
+# utilities = ((-1,-5),(-10,-2),(-3,-20))                                              #   1     0      3         2
 
-utilities = list(( (randint(-1000,-1),randint(-1000,-1)) for _ in range(10) ))
-print("utilities: ",utilities)
+# utilities = list(( (randint(-1000,-1),randint(-1000,-1)) for _ in range(10) ))
+# print("utilities: ",utilities)
 
-a = 0.0
-b = 1.0
-capacity = 5
+a = 1.0
+b = 0.0
+capacity = 2
 
 while True:
     print("Point:", (a, b))
