@@ -1,5 +1,6 @@
-import numpy as np
 import networkx as nx
+from tabulate import tabulate
+
 
 epsilon = 0.0001  # to solve numeric problems
 
@@ -63,6 +64,19 @@ def map_to_utilities(A, utilities):
     return u1, u2, u3
 
 
+def isEF1_two(first, second, worst, best):
+    """
+    :param first: some agent's utility on his bundle
+    :param second: first's utility on other agent's bundle
+    :param worst: the worst chore in first's bundle (in his eyes)
+    :param best: the best good in second's bundle (in the first's eyes)
+    :return: true if the first envious the second up to one item
+    """
+    if first-worst >= second or first >= second-best:
+        return True
+    return False
+
+
 def isEF1(A1, A2, A3, utilities):
     u1A1_lst, u2A1_lst, u3A1_lst = map_to_utilities(A1, utilities)
     u1A2_lst, u2A2_lst, u3A2_lst = map_to_utilities(A2, utilities)
@@ -88,16 +102,21 @@ def isEF1(A1, A2, A3, utilities):
     u1A3 = sum(u1A3_lst)
     u2A3 = sum(u2A3_lst)
     u3A3 = sum(u3A3_lst)
-    if u1A1-worst1 >= u1A2 or u1A1 >= u1A2-best1in2 \
+    print(tabulate([['u1', u1A1, u1A2, u1A3, worst1],
+                    ['u2', u2A1, u2A2, u2A3, worst2],
+                    ['u3', u3A1, u3A2, u3A3, worst3]],
+                   headers=['', 'A1', 'A2', 'A3', 'worst']))
+    print("_______________________________________")
+    if isEF1_two(u1A1, u1A2, worst1, best1in2) \
         and \
-        u1A1-worst1 >= u1A3 or u1A1 >= u1A3-best1in3 \
+        isEF1_two(u1A1, u1A3, worst1, best1in3) \
         and \
-        u2A2-worst2 >= u2A1 or u2A2 >= u2A1-best2in1 \
+        isEF1_two(u2A2, u2A1, worst2, best2in1) \
         and \
-        u2A2-worst2 >= u2A3 or u2A2 >= u2A3-best2in3 \
+        isEF1_two(u2A2, u2A3, worst2, best2in3) \
         and \
-        u3A3-worst3 >= u3A1 or u3A3 >= u3A1-best3in1 \
+        isEF1_two(u3A3, u3A1, worst3, best3in1) \
         and \
-        u3A3-worst3 >= u3A2 or u3A3 >= u3A2-best3in2:
+        isEF1_two(u3A3, u3A2, worst3, best3in2):
         return True
     return False
