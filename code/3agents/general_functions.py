@@ -64,7 +64,7 @@ def map_to_utilities(A, utilities):
     return u1, u2, u3
 
 
-def isEF1_two(first, second, worst, best):
+def isEF1_two(first, second, worst, best, i, j):
     """
     :param first: some agent's utility on his bundle
     :param second: first's utility on other agent's bundle
@@ -73,7 +73,9 @@ def isEF1_two(first, second, worst, best):
     :return: true if the first envious the second up to one item
     """
     if first-worst >= second or first >= second-best:
+        print(i + " envious " + j + " up to one item :)")
         return True
+    print(i + " envious " + j + " a lot :(")
     return False
 
 
@@ -102,21 +104,23 @@ def isEF1(A1, A2, A3, utilities):
     u1A3 = sum(u1A3_lst)
     u2A3 = sum(u2A3_lst)
     u3A3 = sum(u3A3_lst)
+    """
     print(tabulate([['u1', u1A1, u1A2, u1A3, worst1],
                     ['u2', u2A1, u2A2, u2A3, worst2],
                     ['u3', u3A1, u3A2, u3A3, worst3]],
                    headers=['', 'A1', 'A2', 'A3', 'worst']))
     print("_______________________________________")
-    if isEF1_two(u1A1, u1A2, worst1, best1in2) \
+    """
+    if isEF1_two(u1A1, u1A2, worst1, best1in2, "1", "2") \
         and \
-        isEF1_two(u1A1, u1A3, worst1, best1in3) \
+        isEF1_two(u1A1, u1A3, worst1, best1in3, "1", "3") \
         and \
-        isEF1_two(u2A2, u2A1, worst2, best2in1) \
+        isEF1_two(u2A2, u2A1, worst2, best2in1, "2", "1") \
         and \
-        isEF1_two(u2A2, u2A3, worst2, best2in3) \
+        isEF1_two(u2A2, u2A3, worst2, best2in3, "2", "3") \
         and \
-        isEF1_two(u3A3, u3A1, worst3, best3in1) \
+        isEF1_two(u3A3, u3A1, worst3, best3in1, "3", "1") \
         and \
-        isEF1_two(u3A3, u3A2, worst3, best3in2):
+        isEF1_two(u3A3, u3A2, worst3, best3in2, "3", "2"):
         return True
     return False

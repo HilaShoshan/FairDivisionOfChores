@@ -1,7 +1,7 @@
 """"
     3 agents
     3 items in each category
-    same order of utilities ***
+    same order of utilities 
 """""
 
 from general_functions import *
@@ -43,7 +43,7 @@ w3 = 0.0
 step = 0.05
 
 done = False
-for w3 in np.arange(0.4, 0.5, step):
+for w3 in np.arange(0, 1, step):
     for w2 in np.arange(0, 1-w3, step):
         w1 = 1-w2-w3
         if w1 < 0:
@@ -56,10 +56,10 @@ for w3 in np.arange(0.4, 0.5, step):
         print("A1: ", A1)
         print("A2: ", A2)
         print("A3: ", A3)
-        print("_______________________________________")
         if isEF1(A1, A2, A3, utilities):
             print("done!!!!!!!!!!!!!!!")
             done = True
             # break
+        print("_______________________________________")
     # if done:
         # break
