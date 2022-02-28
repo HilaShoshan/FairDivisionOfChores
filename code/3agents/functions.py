@@ -85,7 +85,7 @@ def isEF1_two(first, second, worst, best, i, j):
     return False
 
 
-def isEF1(A1, A2, A3, utilities, ax, w1, w2, w3, dict):
+def isEF1(A1, A2, A3, utilities, ax, w1, w2, w3, colors_dict):
     u1A1_lst, u2A1_lst, u3A1_lst = map_to_utilities(A1, utilities)
     u1A2_lst, u2A2_lst, u3A2_lst = map_to_utilities(A2, utilities)
     u1A3_lst, u2A3_lst, u3A3_lst = map_to_utilities(A3, utilities)
@@ -134,24 +134,24 @@ def isEF1(A1, A2, A3, utilities, ax, w1, w2, w3, dict):
     # draw a point
     if -epsilon < w3 < epsilon:  # we are on the edge (1,2)
         if isEF(u1A1, u1A2) and isEF(u1A1, u1A3):  # agent 1 is not envy
-            ax.plot(w1, w2, w3, "or", markersize=2, color=dict[1])
+            ax.plot(w1, w2, w3, "or", markersize=2, color=colors_dict[1])
         elif isEF(u2A2, u2A1) and isEF(u2A2, u2A3):  # agent 2 is not envy
-            ax.plot(w1, w2, w3, "or", markersize=2, color=dict[2])
+            ax.plot(w1, w2, w3, "or", markersize=2, color=colors_dict[2])
     elif -epsilon < w2 < epsilon:  # we are on edge (1,3)
         if isEF(u1A1, u1A2) and isEF(u1A1, u1A3):  # agent 1 is not envy
-            ax.plot(w1, w2, w3, "or", markersize=2, color=dict[1])
+            ax.plot(w1, w2, w3, "or", markersize=2, color=colors_dict[1])
         elif isEF(u3A3, u3A1) and isEF(u3A3, u3A2):  # agent 3 is not envy
-            ax.plot(w1, w2, w3, "or", markersize=2, color=dict[3])
+            ax.plot(w1, w2, w3, "or", markersize=2, color=colors_dict[3])
     elif -epsilon < w1 < epsilon:  # we are on edge (2,3)
         if isEF(u2A2, u2A1) and isEF(u2A2, u2A3):  # agent 2 is not envy
-            ax.plot(w1, w2, w3, "or", markersize=2, color=dict[2])
+            ax.plot(w1, w2, w3, "or", markersize=2, color=colors_dict[2])
         elif isEF(u3A3, u3A1) and isEF(u3A3, u3A2):  # agent 3 is not envy
-            ax.plot(w1, w2, w3, "or", markersize=2, color=dict[3])
+            ax.plot(w1, w2, w3, "or", markersize=2, color=colors_dict[3])
     else:  # we are inside the triangle
         if isEF(u1A1, u1A2) and isEF(u1A1, u1A3):  # agent 1 is not envy
-            ax.plot(w1, w2, w3, "or", markersize=2, color=dict[1])
+            ax.plot(w1, w2, w3, "or", markersize=2, color=colors_dict[1])
         elif isEF(u2A2, u2A1) and isEF(u2A2, u2A3):  # agent 2 is not envy
-            ax.plot(w1, w2, w3, "or", markersize=2, color=dict[2])
+            ax.plot(w1, w2, w3, "or", markersize=2, color=colors_dict[2])
         else:  # agent 3 is not envy
-            ax.plot(w1, w2, w3, "or", markersize=2, color=dict[3])
+            ax.plot(w1, w2, w3, "or", markersize=2, color=colors_dict[3])
     return ans

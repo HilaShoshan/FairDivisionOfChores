@@ -3,6 +3,7 @@
     3 items in each category
     same order of utilities 
 """ ""
+from collections import deque
 
 from functions import *
 from draw import *
@@ -58,28 +59,36 @@ w3 = 0.0
 step = 0.05
 
 fig, ax = draw_3D_triangle()
-dict = {1: "purple", 2: "orange", 3: "blue"}
+colors_dict = {1: "red", 2: "orange", 3: "blue"}
+allocations_dict = {}  # a dictionary that saves the allocations as keys, with a list of points as values
 
 done = False
-for w3 in np.arange(0, 1, step):
-    for w2 in np.arange(0, 1 - w3, step):
+for w3 in np.arange(0, 1+epsilon, step):
+    for w2 in np.arange(0, 1-w3+epsilon, step):
         w1 = 1 - w2 - w3
-        if w1 < 0:
-            print("An EF1 division has not found.")
-            exit()
-        print("point: ", (w1, w2, w3))
+        # print("point: ", (w1, w2, w3))
         G = create_G(utilities, capacities, (w1, w2, w3))
         matching = nx.max_weight_matching(G, maxcardinality=True)
         A1, A2, A3 = get_allocations(matching)
-        print("A1: ", A1)
-        print("A2: ", A2)
-        print("A3: ", A3)
-        if isEF1(A1, A2, A3, utilities, ax, w1, w2, w3, dict):
+        key = ' '.join(map(str, [A1, A2, A3]))
+        # print(key)
+        if key in allocations_dict:
+            new_point = (w1, w2, w3)
+            res = deque(allocations_dict[key])
+            res.appendleft(new_point)
+            new_list = list(res)  # add this point to the dict
+        else:
+            allocations_dict[key] = [(w1, w2, w3)]  # create a new entry with the new allocation
+        # print("A1: ", A1)
+        # print("A2: ", A2)
+        # print("A3: ", A3)
+        if isEF1(A1, A2, A3, utilities, ax, w1, w2, w3, colors_dict):
             print("done")
             done = True
             # break
-        print("_______________________________________")
+        # print("_______________________________________")
     # if done:
       #  break
 
+# print("****************", allocations_dict)
 plt.show()
