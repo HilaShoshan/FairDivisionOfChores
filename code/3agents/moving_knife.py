@@ -56,7 +56,7 @@ w1 = 1.0
 w2 = 0.0
 w3 = 0.0
 
-step = 0.05
+step = 0.01
 
 fig, ax = draw_3D_triangle()
 colors_dict = {1: "red", 2: "orange", 3: "blue"}
@@ -94,7 +94,7 @@ for w3 in np.arange(0, 1+epsilon, step):
 
 
 def generate_random_color():
-    return ["#"+''.join([random.choice('ABCDEF0123456789') for i in range(6)])]
+    return "#"+''.join([random.choice('ABCDEF0123456789') for i in range(6)])
 
 
 lst = []
@@ -103,7 +103,12 @@ for key in allocations_dict.keys():
     lst.append([key, len(value)])
     background = [value]  # a list of the polygon points
     facecolor = generate_random_color()
-    ax.add_collection3d(Poly3DCollection(background, facecolors=facecolor, linewidths=1, alpha=1))
+    # ax.add_collection3d(Poly3DCollection(background, facecolors=facecolor, linewidths=1, alpha=1))
+    for point in value:
+        w1 = point[0]
+        w2 = point[1]
+        w3 = point[2]
+        ax.plot(w1, w2, w3, "or", markersize=2, color=facecolor)
 
 print(tabulate(lst, headers=['allocation', 'num of points']))
 print("num of points: ", counter)

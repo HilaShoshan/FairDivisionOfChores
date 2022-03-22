@@ -132,6 +132,7 @@ def isEF1(A1, A2, A3, utilities, ax, w1, w2, w3, colors_dict):
         ans = False
 
     # draw a point
+    """
     if -epsilon < w3 < epsilon:  # we are on the edge (1,2)
         if isEF(u1A1, u1A2) and isEF(u1A1, u1A3):  # agent 1 is not envy
             ax.plot(w1, w2, w3, "or", markersize=2, color=colors_dict[1])
@@ -154,4 +155,5 @@ def isEF1(A1, A2, A3, utilities, ax, w1, w2, w3, colors_dict):
             ax.plot(w1, w2, w3, "or", markersize=2, color=colors_dict[2])
         else:  # agent 3 is not envy
             ax.plot(w1, w2, w3, "or", markersize=2, color=colors_dict[3])
+    """
     return ans
